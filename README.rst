@@ -46,3 +46,9 @@ Disabling input
 Then disable the device, e.g.::
 
     > xinput disable 10
+
+Todo
+====
+
+* Look at pushing output to other applications?
+* Write a kernel module to emulate a real keyboard?
