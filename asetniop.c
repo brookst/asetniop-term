@@ -161,7 +161,7 @@ void add_state(unsigned char a) {
     //[97, 115, 101, 116, 110, 105, 111, 112]
     switch(a) {
         case 49: //Shift
-            state.thumb_keys |= 0x01;
+            state.thumb_keys ^= 0x01;
             break;
         case 50: //Space
             state.thumb_keys |= 0x02;
