@@ -290,7 +290,11 @@ int main(int argc, char *argv[]) {
 #if DEBUG_STATE
                     fputs(": ", stderr);
 #endif
-                    printf("%c", c);
+                    if(c == '\b'){
+                        printf("\b \b");
+                    } else {
+                        printf("%c", c);
+                    }
                     fflush(stdout);
                 }
                 zero_state();
