@@ -221,11 +221,13 @@ char* print_state() {
     return array;
 }
 
-unsigned char get_char() {
+char get_char() {
     if(state.thumb_keys == 0x3 && state.finger_keys == 0x0) {
         return '\n';
     } else if(state.thumb_keys == 0x2 && state.finger_keys == 0x0) {
         return ' ';
+    } else if(state.finger_keys == 0x11) {
+        return -1;
     } else if(state.thumb_keys == 0x0) {
         return lower_letters_map[state.finger_keys];
     } else if(state.thumb_keys == 0x1) {
@@ -285,16 +287,15 @@ int main(int argc, char *argv[]) {
                 if(keys_map[ev[1].code] == '1') { //Bail out if this is a shift release
                     continue;
                 }
-                unsigned char c;
-                if((c = get_char())) {
+                char c;
+                if((c = get_char()) > 0) {
 #if DEBUG_STATE
                     fputs(": ", stderr);
 #endif
-                    if(c == '\b'){
-                        printf("\b \b");
-                    } else {
-                        printf("%c", c);
-                    }
+                    printf("%c", c);
+                    fflush(stdout);
+                } else if(c == -1) {
+                    printf("\b \b");
                     fflush(stdout);
                 }
                 zero_state();
