@@ -20,9 +20,10 @@ Debugging
 ---------
 
 To debug, set the ``DEBUG`` env var to:
- * ``DEBUG`` to show device acquisition
- * ``DEBUG_EVENT`` to show keydown and keyup events
- * ``DEBUG_STATE`` to show the asetniop state
+
+* ``DEBUG`` to show device acquisition
+* ``DEBUG_EVENT`` to show keydown and keyup events
+* ``DEBUG_STATE`` to show the asetniop state
 
 like so::
 
