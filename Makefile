@@ -21,3 +21,6 @@ asetniop.exe: asetniop.c
 
 run: asetniop.exe
 	./asetniop.exe /dev/input/by-path/*-kbd
+
+clean:
+	rm -rf asetniop.exe
