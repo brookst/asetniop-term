@@ -35,7 +35,7 @@ ASETNIOP_SHIFT["'"] = "\""
 ASETNIOP_SHIFT["\b"] = "\b" #DEL
 ASETNIOP_SHIFT[";"] = ":"
 
-#Scan-codes for a Microsoft Comfort Curve Keyboard
+#Scan-codes from include/linux/input.h
 #1: Shift key, 2: Space key
 SCANCODE_ASETNIOP = "          " "      aset" "  niop    " "aset  niop" \
                     "  1 1111 2" "222 1  2  " "          " "          " \
