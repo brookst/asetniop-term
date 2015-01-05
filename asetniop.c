@@ -261,6 +261,7 @@ int main(int argc, char *argv[]) {
     //Print Device Name
     ioctl(fd, EVIOCGNAME (sizeof(name)), name);
     DEBUG_PRINT("Reading from: %s (%s)\n", device, name);
+    system("stty -echo");
 
     while(1) {
         if((rd = read(fd, ev, size * 64)) < size)

@@ -29,10 +29,12 @@ like so::
 
     > DEBUG=DEBUG_STATE make
 
-Disabling xinput
-================
+Disabling input
+===============
 
-``asetniop-term`` reads keyboard events, but does not prevent them being read by other processes, like X11. To disable the keyboard under X11 (make sure you have some other way to control the system!) - find the device id like so::
+``asetniop-term`` disables the terminal echo and ignores ``stdin``. After running, the terminal should be back to its normal state, but if not, ``stty echo`` should fix it.
+
+``asetniop-term`` does not prevent key events being read by other processes, like X11. To disable the keyboard under X11 (make sure you have some other way to control the system!) - find the device id like so::
 
     > xinput
     ⎡ Virtual core pointer                      id=2    [master pointer  (3)]
