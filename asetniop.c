@@ -58,7 +58,7 @@ cog_stanza(gen_maps.uppercase_stanza)
 
 //Map scan codes to asetniop keys
 unsigned char keys_map[256] =
-    "                aset  niop    aset  niop    1111 2222    2      "
+    "                aset  niop    aset  niop  1 1111 2222 1  2      "
     "                                                                "
     "                                                                "
     "                                                                "

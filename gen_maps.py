@@ -38,7 +38,7 @@ ASETNIOP_SHIFT[";"] = ":"
 #Scan-codes for a Microsoft Comfort Curve Keyboard
 #1: Shift key, 2: Space key
 SCANCODE_ASETNIOP = "          " "      aset" "  niop    " "aset  niop" \
-                    "    1111 2" "222    2  " "          " "          " \
+                    "  1 1111 2" "222 1  2  " "          " "          " \
                     "          " "          " "          " "          " \
                     "          " "          " "          " "          " \
                     "          " "          " "          " "          " \
