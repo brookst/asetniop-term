@@ -201,8 +201,8 @@ void print_finger_key(int mask, char label) {
     }
 }
 
-unsigned char* print_state() {
-    unsigned char * array = malloc(21 * sizeof(char));
+char* print_state() {
+    char * array = malloc(21 * sizeof(char));
     if(array == NULL) {
         printf("Fail!\n");
         exit(1);
@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
                 EVENT_PRINT("Keydown [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]);
                 add_state(keys_map[ev[1].code]);
 #if DEBUG_STATE
-                unsigned char * msg = print_state();
+                char * msg = print_state();
                 printf("\n");
                 fputs(msg, stderr);
                 free(msg);
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
                     continue;
                 }
                 unsigned char c;
-                if(c = get_char()) {
+                if((c = get_char())) {
 #if DEBUG_STATE
                     fputs(": ", stderr);
 #endif
