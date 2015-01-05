@@ -5,11 +5,22 @@
 //
 // See http://asetniop.com/
 // Based on http://www.thelinuxdaily.com/2010/05/grab-raw-keyboard-input-from-event-device-node-devinputevent/
+//
+// DEBUG FLAGS:
+//  * DEBUG - show device aquisition messages
+//  * DEBUG_EVENT - show key up and key down events
+//  * DEBUG_STATE - show asetniop state during keypresses
 
 #ifdef DEBUG
 #define DEBUG_PRINT(fmt, args...)    fprintf(stderr, fmt, ## args)
 #else
 #define DEBUG_PRINT(fmt, args...)
+#endif
+
+#ifdef DEBUG_EVENT
+#define EVENT_PRINT(fmt, args...)    fprintf(stderr, fmt, ## args)
+#else
+#define EVENT_PRINT(fmt, args...)
 #endif
 
 #include <stdio.h>
@@ -193,7 +204,7 @@ void print_finger_key(int mask, char label) {
 unsigned char* print_state() {
     unsigned char * array = malloc(21 * sizeof(char));
     if(array == NULL) {
-        DEBUG_PRINT("Fail!\n");
+        printf("Fail!\n");
         exit(1);
     }
     array[0] = (state.finger_keys & 0x80) ?  97 : 32;
@@ -260,22 +271,24 @@ int main(int argc, char *argv[]) {
         // if(value != ' ' && ev[1].value == 1 && ev[1].type == 1){ // Only read the key press event
         if(value != ' ' && ev[1].type == 1){ // Only read the key press event
             if(ev[1].value == 1) {
-                /* DEBUG_PRINT("Keydown [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]); */
+                EVENT_PRINT("Keydown [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]);
                 add_state(keys_map[ev[1].code]);
-#if DEBUG
+#if DEBUG_STATE
                 unsigned char * msg = print_state();
                 printf("\n");
                 fputs(msg, stderr);
                 free(msg);
 #endif
             } else if(ev[1].value == 0) {
-                /* DEBUG_PRINT("Keyup   [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]); */
+                EVENT_PRINT("Keyup   [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]);
                 if(keys_map[ev[1].code] == 49) { //Bail out if this is a shift release
                     continue;
                 }
                 unsigned char c;
                 if(c = get_char()) {
-                    DEBUG_PRINT(": ");
+#if DEBUG_STATE
+                    fputs(": ", stderr);
+#endif
                     printf("%c", c);
                     fflush(stdout);
                 }
