@@ -315,7 +315,7 @@ void print_finger_key(int mask, char label) {
 }
 
 char* print_state() {
-    char * array = malloc(21 * sizeof(char));
+    char * array = malloc(31 * sizeof(char));
     if(array == NULL) {
         printf("Fail!\n");
         exit(1);
@@ -328,9 +328,12 @@ char* print_state() {
     array[5] = (state.finger_keys & 0x04) ? 'i' : 32;
     array[6] = (state.finger_keys & 0x02) ? 'o' : 32;
     array[7] = (state.finger_keys & 0x01) ? 'p' : 32;
-    sprintf(array + 8, " %s", (state.thumb_keys & 0x1) ? "SHIFT" : "     ");
-    sprintf(array + 14, " %s", (state.thumb_keys & 0x2) ? "SPACE" : "     ");
-    array[20] = 0;  //NULL
+    sprintf(array + 8, "%1s", (state.thumb_keys & 0x4) ? "5" : "");
+    sprintf(array + 9, "%1s", (state.thumb_keys & 0x8) ? "6" : "");
+    sprintf(array + 10, "%6s", (state.thumb_keys & 0x1) ? "SHIFT" : "");
+    sprintf(array + 16, "%6s", (state.thumb_keys & 0x2) ? "SPACE" : "");
+    sprintf(array + 22, "%8s", (state.thumb_keys & 0x10) ? "NUMERIC" : "");
+    array[30] = 0;  //NULL
     return array;
 }
 
