@@ -20,4 +20,4 @@ asetniop.exe: asetniop.c
 	$(CC) $(OPT) -o $@ $<
 
 run: asetniop.exe
-	sudo ./asetniop.exe /dev/input/by-path/*-kbd
+	./asetniop.exe /dev/input/by-path/*-kbd
