@@ -160,34 +160,34 @@ void zero_state() {
 void add_state(unsigned char a) {
     //[97, 115, 101, 116, 110, 105, 111, 112]
     switch(a) {
-        case 49: //Shift
+        case '1': //Shift
             state.thumb_keys ^= 0x01;
             break;
-        case 50: //Space
+        case '2': //Space
             state.thumb_keys |= 0x02;
             break;
-        case 97:
+        case 'a':
             state.finger_keys |= 0x80;
             break;
-        case 115:
+        case 's':
             state.finger_keys |= 0x40;
             break;
-        case 101:
+        case 'e':
             state.finger_keys |= 0x20;
             break;
-        case 116:
+        case 't':
             state.finger_keys |= 0x10;
             break;
-        case 110:
+        case 'n':
             state.finger_keys |= 0x08;
             break;
-        case 105:
+        case 'i':
             state.finger_keys |= 0x04;
             break;
-        case 111:
+        case 'o':
             state.finger_keys |= 0x02;
             break;
-        case 112:
+        case 'p':
             state.finger_keys |= 0x01;
             break;
     }
@@ -207,14 +207,14 @@ char* print_state() {
         printf("Fail!\n");
         exit(1);
     }
-    array[0] = (state.finger_keys & 0x80) ?  97 : 32;
-    array[1] = (state.finger_keys & 0x40) ? 115 : 32;
-    array[2] = (state.finger_keys & 0x20) ? 101 : 32;
-    array[3] = (state.finger_keys & 0x10) ? 116 : 32;
-    array[4] = (state.finger_keys & 0x08) ? 110 : 32;
-    array[5] = (state.finger_keys & 0x04) ? 105 : 32;
-    array[6] = (state.finger_keys & 0x02) ? 111 : 32;
-    array[7] = (state.finger_keys & 0x01) ? 112 : 32;
+    array[0] = (state.finger_keys & 0x80) ? 'a' : 32;
+    array[1] = (state.finger_keys & 0x40) ? 's' : 32;
+    array[2] = (state.finger_keys & 0x20) ? 'e' : 32;
+    array[3] = (state.finger_keys & 0x10) ? 't' : 32;
+    array[4] = (state.finger_keys & 0x08) ? 'n' : 32;
+    array[5] = (state.finger_keys & 0x04) ? 'i' : 32;
+    array[6] = (state.finger_keys & 0x02) ? 'o' : 32;
+    array[7] = (state.finger_keys & 0x01) ? 'p' : 32;
     sprintf(array + 8, " %s", (state.thumb_keys & 0x1) ? "SHIFT" : "     ");
     sprintf(array + 14, " %s", (state.thumb_keys & 0x2) ? "SPACE" : "     ");
     array[20] = 0;  //NULL
@@ -223,9 +223,9 @@ char* print_state() {
 
 unsigned char get_char() {
     if(state.thumb_keys == 0x3 && state.finger_keys == 0x0) {
-        return 0x0A;
+        return '\n';
     } else if(state.thumb_keys == 0x2 && state.finger_keys == 0x0) {
-        return 0x20;
+        return ' ';
     } else if(state.thumb_keys == 0x0) {
         return lower_letters_map[state.finger_keys];
     } else if(state.thumb_keys == 0x1) {
@@ -281,7 +281,7 @@ int main(int argc, char *argv[]) {
 #endif
             } else if(ev[1].value == 0) {
                 EVENT_PRINT("Keyup   [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]);
-                if(keys_map[ev[1].code] == 49) { //Bail out if this is a shift release
+                if(keys_map[ev[1].code] == '1') { //Bail out if this is a shift release
                     continue;
                 }
                 unsigned char c;
