@@ -244,19 +244,19 @@ int main(int argc, char *argv[]) {
 
     //Setup check
     if(argv[1] == NULL){
-        printf("Please specify (on the command line) the path to the dev event interface device\n");
+        fputs("Please specify (on the command line) the path to the device event interface\n", stderr);
         exit(0);
     }
 
     if((getuid()) != 0)
-        printf("You are not root! This may not work...\n");
+        fputs("You are not root! Ensure you have read permissions on this device\n", stderr);
 
     if(argc > 1)
         device = argv[1];
 
     //Open Device
     if((fd = open(device, O_RDONLY)) == -1)
-        printf("%s is not a vaild device.\n", device);
+        fprintf(stderr, "%s is not a vaild device.\n", device);
 
     //Print Device Name
     ioctl(fd, EVIOCGNAME (sizeof(name)), name);
