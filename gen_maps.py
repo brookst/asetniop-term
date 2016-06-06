@@ -124,7 +124,7 @@ def bits_stanza():
     return ret
 
 def scancode_stanza():
-    """Map scan codes to asetniop keys"""
+    """Map scan codes to asetniop keys V:Shift N:Space"""
     ret = []
     ret.append("//" + scancode_stanza.__doc__)
     ret.append("unsigned char keys_map[256] =")

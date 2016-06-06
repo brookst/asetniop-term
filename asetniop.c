@@ -76,7 +76,7 @@ cog_stanza(gen_maps.symbol_stanza)
 //ASETNIOP bits
 //A:80 S:40 E:20 T:10 N:08 I:04 O:02 P:01
 
-//Map scan codes to asetniop keys
+//Map scan codes to asetniop keys V:Shift N:Space
 unsigned char keys_map[256] =
     "  1234567890    aset  niop    aset  niop  V VVVV NNNN V  N      "
     "                                                                "
@@ -330,10 +330,10 @@ char* print_state() {
     array[5] = (state.finger_keys & 0x04) ? 'i' : 32;
     array[6] = (state.finger_keys & 0x02) ? 'o' : 32;
     array[7] = (state.finger_keys & 0x01) ? 'p' : 32;
-    sprintf(array + 8, "%1s", (state.thumb_keys & 0x4) ? "5" : "");
-    sprintf(array + 9, "%1s", (state.thumb_keys & 0x8) ? "6" : "");
-    sprintf(array + 10, "%6s", (state.thumb_keys & 0x1) ? "SHIFT" : "");
-    sprintf(array + 16, "%6s", (state.thumb_keys & 0x2) ? "SPACE" : "");
+    sprintf(array +  8, "%1s", (state.thumb_keys & 0x04) ? "5" : "");
+    sprintf(array +  9, "%1s", (state.thumb_keys & 0x08) ? "6" : "");
+    sprintf(array + 10, "%6s", (state.thumb_keys & 0x01) ? "SHIFT" : "");
+    sprintf(array + 16, "%6s", (state.thumb_keys & 0x02) ? "SPACE" : "");
     sprintf(array + 22, "%8s", (state.thumb_keys & 0x10) ? "NUMERIC" : "");
     array[30] = 0;  //NULL
     return array;
@@ -392,7 +392,7 @@ int main(int argc, char *argv[]) {
 
     //Open Device
     if((fd = open(device, O_RDONLY)) == -1)
-        fprintf(stderr, "%s is not a vaild device.\n", device);
+        fprintf(stderr, "%s is not a valid device.\n", device);
 
     //Print Device Name
     ioctl(fd, EVIOCGNAME (sizeof(name)), name);
