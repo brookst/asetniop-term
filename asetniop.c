@@ -231,6 +231,8 @@ unsigned char symbol_map[256] = {
 
 void handler(int sig) {
     printf("\nexiting...(%d)\n", sig);
+    fflush(stdout);
+    system("stty echo");
     exit(0);
 }
 
@@ -385,6 +387,8 @@ int main(int argc, char *argv[]) {
 
     if(argc > 1)
         device = argv[1];
+
+    signal(SIGINT, handler);
 
     //Open Device
     if((fd = open(device, O_RDONLY)) == -1)
