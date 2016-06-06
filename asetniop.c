@@ -369,7 +369,7 @@ char get_char() {
 
 int main(int argc, char *argv[]) {
     struct input_event ev[64];
-    int fd, rd, value, size = sizeof(struct input_event);
+    int fd, rd, size = sizeof(struct input_event);
     char name[256] = "Unknown";
     char *device = NULL;
     zero_state();
@@ -399,10 +399,7 @@ int main(int argc, char *argv[]) {
         if((rd = read(fd, ev, size * 64)) < size)
             perror_exit("read()");
 
-        value = ev[0].value;
-
-        // if(value != ' ' && ev[1].value == 1 && ev[1].type == 1){ // Only read the key press event
-        if(value != ' ' && ev[1].type == 1){ // Only read the key press event
+        if(ev[1].type == 1){ // Only read the key press event
             if(ev[1].value == 1) {
                 EVENT_PRINT("Keydown [%d]: %c\n", (ev[1].code), keys_map[ev[1].code]);
                 add_state(keys_map[ev[1].code]);
