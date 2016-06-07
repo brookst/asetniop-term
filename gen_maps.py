@@ -93,6 +93,61 @@ SCANCODE_ASETNIOP = "  12345678" "90    aset" "  niop    " "aset  niop" \
                     "0123456789" "          " "          " "          " \
                     "          " "      "
 
+SCANCODE_KEYS = [0] * 256
+SCANCODE_KEYS[ord('1')] = 2
+SCANCODE_KEYS[ord('2')] = 3
+SCANCODE_KEYS[ord('3')] = 4
+SCANCODE_KEYS[ord('4')] = 5
+SCANCODE_KEYS[ord('5')] = 6
+SCANCODE_KEYS[ord('6')] = 7
+SCANCODE_KEYS[ord('7')] = 8
+SCANCODE_KEYS[ord('8')] = 9
+SCANCODE_KEYS[ord('9')] = 10
+SCANCODE_KEYS[ord('0')] = 11
+
+SCANCODE_KEYS[ord('-')] = 12
+SCANCODE_KEYS[ord('=')] = 13
+SCANCODE_KEYS[8] = 14
+SCANCODE_KEYS[127] = 14
+
+SCANCODE_KEYS[ord('q')] = 16
+SCANCODE_KEYS[ord('w')] = 17
+SCANCODE_KEYS[ord('e')] = 18
+SCANCODE_KEYS[ord('r')] = 19
+SCANCODE_KEYS[ord('t')] = 20
+SCANCODE_KEYS[ord('y')] = 21
+SCANCODE_KEYS[ord('u')] = 22
+SCANCODE_KEYS[ord('i')] = 23
+SCANCODE_KEYS[ord('o')] = 24
+SCANCODE_KEYS[ord('p')] = 25
+
+SCANCODE_KEYS[10] = 28
+
+SCANCODE_KEYS[ord('a')] = 30
+SCANCODE_KEYS[ord('s')] = 31
+SCANCODE_KEYS[ord('d')] = 32
+SCANCODE_KEYS[ord('f')] = 33
+SCANCODE_KEYS[ord('g')] = 34
+SCANCODE_KEYS[ord('h')] = 35
+SCANCODE_KEYS[ord('j')] = 36
+SCANCODE_KEYS[ord('k')] = 37
+SCANCODE_KEYS[ord('l')] = 38
+SCANCODE_KEYS[ord(';')] = 39
+SCANCODE_KEYS[ord('\'')] = 40
+
+SCANCODE_KEYS[ord('z')] = 44
+SCANCODE_KEYS[ord('x')] = 45
+SCANCODE_KEYS[ord('c')] = 46
+SCANCODE_KEYS[ord('v')] = 47
+SCANCODE_KEYS[ord('b')] = 48
+SCANCODE_KEYS[ord('n')] = 49
+SCANCODE_KEYS[ord('m')] = 50
+SCANCODE_KEYS[ord(',')] = 51
+SCANCODE_KEYS[ord('.')] = 52
+SCANCODE_KEYS[ord('/')] = 53
+
+SCANCODE_KEYS[ord(' ')] = 57
+
 def chunks(seq, length):
     """Chunk seq into length sized sub-sequences"""
     for index in range(0, len(seq), length):
@@ -131,6 +186,16 @@ def scancode_stanza():
     for chunk in chunks(SCANCODE_ASETNIOP, 64):
         ret.append("    \"%s\"" %chunk)
     ret.append(";")
+    return ret
+
+def keys_stanza():
+    """Map ascii chars to key scan codes"""
+    ret = []
+    ret.append("//" + keys_stanza.__doc__)
+    ret.append("unsigned char scancode[256] = {")
+    for chunk in chunks(SCANCODE_KEYS, 8):
+        ret.append("    " + ", ".join("0x%02X" %c for c in chunk) + ",")
+    ret.append("};")
     return ret
 
 def lowercase_stanza():
@@ -180,7 +245,7 @@ def print_stanza(stanza):
 
 def main():
     """Print all maps"""
-    for stanza in [bits_stanza, scancode_stanza,
+    for stanza in [bits_stanza, scancode_stanza, keys_stanza,
                    lowercase_stanza, uppercase_stanza,
                    numeral_stanza, symbol_stanza,
                   ]:

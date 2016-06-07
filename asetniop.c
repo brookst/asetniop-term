@@ -47,6 +47,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <linux/input.h>
+#include <linux/uinput.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/select.h>
@@ -64,6 +65,8 @@ def cog_stanza(stanza):
 cog_stanza(gen_maps.bits_stanza)
 cog.outl("")
 cog_stanza(gen_maps.scancode_stanza)
+cog.outl("")
+cog_stanza(gen_maps.keys_stanza)
 cog.outl("")
 cog_stanza(gen_maps.lowercase_stanza)
 cog.outl("")
@@ -83,6 +86,42 @@ unsigned char keys_map[256] =
     "                                                                "
     "        0123456789                                              "
 ;
+
+//Map ascii chars to key scan codes
+unsigned char scancode[256] = {
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x0E, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x39, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28,
+    0x00, 0x00, 0x00, 0x00, 0x33, 0x0C, 0x34, 0x35,
+    0x0B, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+    0x09, 0x0A, 0x00, 0x27, 0x00, 0x0D, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x1E, 0x30, 0x2E, 0x20, 0x12, 0x21, 0x22,
+    0x23, 0x17, 0x24, 0x25, 0x26, 0x32, 0x31, 0x18,
+    0x19, 0x10, 0x13, 0x1F, 0x14, 0x16, 0x2F, 0x11,
+    0x2D, 0x15, 0x2C, 0x00, 0x00, 0x00, 0x00, 0x0E,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
 
 //Map asetniop bit patterns to lower-case chars
 unsigned char lower_letters_map[256] = {
@@ -229,8 +268,15 @@ unsigned char symbol_map[256] = {
 };
 //[[[end]]]
 
+int uinput_fd;
+
 void handler(int sig) {
     printf("\nexiting...(%d)\n", sig);
+    if (uinput_fd > 0) {
+        if(ioctl(uinput_fd, UI_DEV_DESTROY) < 0)
+            printf("Failed to destroy uinput virtual device\n");
+        close(uinput_fd);
+    }
     fflush(stdout);
     system("stty echo");
     exit(0);
@@ -344,8 +390,6 @@ char get_char() {
         return '\n';
     } else if(state.thumb_keys == 0x2 && state.finger_keys == 0x0) {
         return ' ';
-    } else if(state.finger_keys == 0x11) {
-        return -1;
     } else if(state.thumb_keys == 0x0) {
         return lower_letters_map[state.finger_keys];
     } else if(state.thumb_keys == 0x1) {
@@ -367,6 +411,90 @@ char get_char() {
     } else {
         return 0x0;
     }
+}
+
+int uinput_create() {
+    struct uinput_user_dev uidev;
+    memset(&uidev, 0, sizeof(uidev));
+
+    uinput_fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+    if (uinput_fd < 0) return -1;
+
+    if (ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY) < 0) return -1;
+    for (int key=KEY_ESC; key<=KEY_UNKNOWN; key++) {
+        if(ioctl(uinput_fd, UI_SET_KEYBIT, key) < 0) return -1;
+    }
+
+    snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "asetniop-term");
+    uidev.id.bustype = BUS_USB;
+    uidev.id.vendor  = 0x1;
+    uidev.id.product = 0x1;
+    uidev.id.version = 1;
+
+    if ( (write(uinput_fd, &uidev, sizeof(uidev)) < 0)
+        || (ioctl(uinput_fd, UI_DEV_CREATE) < 0) ) return -1;
+    return 0;
+}
+
+int send_ev(unsigned int type, unsigned int code, int value) {
+    struct input_event ev;
+    ev.type = type;
+    ev.code = code;
+    ev.value = value;
+    return write(uinput_fd, &ev, sizeof(struct input_event));
+}
+
+void send_syn() {
+    if (send_ev(EV_SYN, SYN_REPORT, 0) < 0) {
+        fprintf(stderr, "Failed to send uinput syn\n");
+        handler(-1);
+    }
+}
+
+int send_key(int key_code, int shift) {
+    DEBUG_PRINT("Sending keycode: %3d (0x%02x)\n", key_code, (int) key_code);
+    struct input_event ev;
+    memset(&ev, 0, sizeof(struct input_event));
+
+    if (shift == 1) {
+        if(send_ev(EV_KEY, KEY_LEFTSHIFT, 1) < 0) {
+            fprintf(stderr, "Failed to send uinput virtual shift\n");
+            handler(-1);
+        }
+    }
+    if(send_ev(EV_KEY, key_code, 1) < 0) {
+        fprintf(stderr, "Failed to send uinput virtual press\n");
+        handler(-1);
+    }
+    if(send_ev(EV_KEY, key_code, 0) < 0) {
+        fprintf(stderr, "Failed to send uinput virtual release\n");
+        handler(-1);
+    }
+    if (shift == 1) {
+        if(send_ev(EV_KEY, KEY_LEFTSHIFT, 0) < 0) {
+            fprintf(stderr, "Failed to send uinput virtual unshift\n");
+            handler(-1);
+        }
+    }
+    send_syn();
+
+    return 0;
+}
+
+int send_char(char value) {
+    int shift = 0;
+    if ( (value > 0x40) && (value < 0x5b) ) {
+        value += 0x20;
+        shift = 1;
+    }
+    if ( (value > 0x61) && (value < 0x7a) ) {
+        DEBUG_PRINT("Sending char: '%c' (%3d)%s\n", value, (int) value,
+                    shift ? " [SHIFT]" : "");
+    } else {
+        DEBUG_PRINT("Sending char: 0x%02x (%3d)%s\n", (int) value, (int) value,
+                    shift ? " [SHIFT]" : "");
+    }
+    return send_key(scancode[(unsigned int) value], shift);
 }
 
 int main(int argc, char *argv[]) {
@@ -397,6 +525,13 @@ int main(int argc, char *argv[]) {
     //Print Device Name
     ioctl(fd, EVIOCGNAME (sizeof(name)), name);
     DEBUG_PRINT("Reading from: %s (%s)\n", device, name);
+
+    //Create uinput virtual device
+    if (uinput_create() < 0) {
+        fprintf(stderr, "Failed to create uinput device\n");
+        handler(-1);
+    }
+
     system("stty -echo");
 
     while(1) {
@@ -423,10 +558,14 @@ int main(int argc, char *argv[]) {
 #if DEBUG_STATE
                     fputs(": ", stderr);
 #endif
-                    printf("%c", c);
-                    fflush(stdout);
-                } else if(c == -1) {
-                    printf("\b \b");
+                    DEBUG_PRINT("Got char: '%c' (%3d)\n", c, (int) c);
+                    fflush(stderr);
+                    send_char(c);
+                    if (c == 127) {
+                        printf("\b \b");
+                    } else {
+                        printf("%c", c);
+                    }
                     fflush(stdout);
                 }
                 zero_state();
